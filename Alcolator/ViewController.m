@@ -14,6 +14,8 @@
 
 @property (weak, nonatomic) IBOutlet UISlider *beerCountSlider;
 
+@property (weak, nonatomic) IBOutlet UILabel *beerCountLabel;
+
 @property (weak, nonatomic) IBOutlet UILabel *resultLabel;
 
 @end
@@ -39,10 +41,22 @@
 }
 
 - (IBAction)sliderValueDidChange:(UISlider *)sender {
-    
     NSLog(@"Slider value changed to %f", sender.value);
     [self.beerPercentTextField resignFirstResponder];
+    
+    // added beer label starts here
+    int beerCounter = self.beerCountSlider.value;
+    NSString *beerTextAgain;
+    if (beerCounter == 1) {
+        beerTextAgain = NSLocalizedString(@"beer", @"singular beer");
+    } else {
+        beerTextAgain = NSLocalizedString(@"beers", @"plural of beer");
+    }
+    NSString *beerCountText = [NSString stringWithFormat:NSLocalizedString(@"%d %@", nil), beerCounter, beerTextAgain];
+    self.beerCountLabel.text = beerCountText;
+    // added beer label ends here
 }
+
 
 - (IBAction)buttonPressed:(UIButton *)sender {
     
@@ -77,7 +91,6 @@
     } else {
         wineText = NSLocalizedString(@"glasses", @"plural of glass");
     }
-    
     
     
     NSString *resultText = [NSString stringWithFormat:NSLocalizedString(@"%d %@ contains as much alcohol as %.1f %@ of wine.", nil), numberOfBeers, beerText, numberOfWineGlassesForEquivalentAlcoholAmount, wineText];
