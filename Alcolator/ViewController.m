@@ -18,6 +18,19 @@
 
 @implementation ViewController
 
+int beerCounter;
+int ouncesInOneBeerGlass = 12;
+float ouncesInOneWineGlass = 5;
+float alcoholPercentageOfWine = 0.13;
+float alcoholPercentageOfBeer;
+float ouncesOfAlcoholPerBeer;
+float ouncesOfAlcoholTotal;
+float ouncesOfAlcoholPerWineGlass;
+float numberOfWineGlassesForEquivalentAlcoholAmount;
+NSString *beerText;
+NSString *wineText;
+
+
 - (void)loadView {
     self.view = [[UIView alloc] init];
     
@@ -49,6 +62,7 @@
     self.view.backgroundColor = [UIColor lightGrayColor];
     [[UILabel appearance] setFont:[UIFont fontWithName:@"TrebuchetMS" size:14]];
     [[UITextField appearance] setFont:[UIFont fontWithName:@"TrebuchetMS" size:14]];
+    self.title = NSLocalizedString(@"Wine", @"wine");
     // colors go here
     self.beerPercentTextField.delegate = self;
     self.beerPercentTextField.placeholder = NSLocalizedString(@"% Alcohol Content Per Beer", @"Beer percent placeholder text");
@@ -76,6 +90,7 @@
     self.sliderCountLabel.numberOfLines = 0;
     self.sliderCountLabel.textAlignment = NSTextAlignmentCenter;
     
+    
 
 }
 
@@ -88,13 +103,13 @@
     CGFloat padding = 20;
     CGFloat itemWidth = viewWidth - padding - padding;
     CGFloat itemHeight = 34;
-    self.beerPercentTextField.frame = CGRectMake(padding, viewHeight/15, itemWidth, itemHeight);
+    self.beerPercentTextField.frame = CGRectMake(padding, viewHeight/6, itemWidth, itemHeight);
     CGFloat bottomOfTextField = CGRectGetMaxY(self.beerPercentTextField.frame);
     self.beerCountSlider.frame = CGRectMake(padding, bottomOfTextField + padding, itemWidth, itemHeight);
     CGFloat bottomOfSlider = CGRectGetMaxY(self.beerCountSlider.frame);
     self.sliderCountLabel.frame = CGRectMake(padding, bottomOfSlider, itemWidth, itemHeight);
     CGFloat bottomOfSliderLabel = CGRectGetMaxY(self.sliderCountLabel.frame);
-    self.resultLabel.frame = CGRectMake(padding, bottomOfSliderLabel + padding, itemWidth, itemHeight * 2);
+    self.resultLabel.frame = CGRectMake(padding, bottomOfSliderLabel, itemWidth, itemHeight * 2);
     CGFloat bottomOfLabel = CGRectGetMaxY(self.resultLabel.frame);
     self.calculateButton.frame = CGRectMake(padding * 5, bottomOfLabel + padding, itemWidth - (padding *8), itemHeight+8);
     
@@ -118,60 +133,41 @@
 - (void)sliderValueDidChange:(UISlider *)sender {
     NSLog(@"Slider value changed to %f", sender.value);
     [self.beerPercentTextField resignFirstResponder];
-    
-    // added beer label starts here
-    int beerCounter = self.beerCountSlider.value;
-    NSString *beerTextAgain;
+    beerCounter = self.beerCountSlider.value;
+    alcoholPercentageOfBeer = [self.beerPercentTextField.text floatValue] / 100;
+    ouncesOfAlcoholPerBeer = ouncesInOneBeerGlass * alcoholPercentageOfBeer;
+    ouncesOfAlcoholTotal = ouncesOfAlcoholPerBeer * beerCounter;
+    ouncesOfAlcoholPerWineGlass = ouncesInOneWineGlass * alcoholPercentageOfWine;
+    numberOfWineGlassesForEquivalentAlcoholAmount = ouncesOfAlcoholTotal / ouncesOfAlcoholPerWineGlass;
+
     if (beerCounter == 1) {
-        beerTextAgain = NSLocalizedString(@"beer", @"singular beer");
-    } else {
-        beerTextAgain = NSLocalizedString(@"beers", @"plural of beer");
-    }
-    NSString *beerCountText = [NSString stringWithFormat:NSLocalizedString(@"%d %@", nil), beerCounter, beerTextAgain];
-    self.sliderCountLabel.text = beerCountText;
-    // added beer label ends here
-}
-
-
-- (void)buttonPressed:(UIButton *)sender {
-    
-    [self.beerPercentTextField resignFirstResponder];
-    
-    int numberOfBeers = self.beerCountSlider.value;
-    int ouncesInOneBeerGlass = 12;
-    
-    float alcoholPercentageOfBeer = [self.beerPercentTextField.text floatValue] / 100;
-    float ouncesOfAlcoholPerBeer = ouncesInOneBeerGlass * alcoholPercentageOfBeer;
-    float ouncesOfAlcoholTotal = ouncesOfAlcoholPerBeer * numberOfBeers;
-    
-    float ouncesInOneWineGlass = 5;
-    float alcoholPercentageOfWine = 0.13;
-    
-    float ouncesOfAlcoholPerWineGlass = ouncesInOneWineGlass * alcoholPercentageOfWine;
-    float numberOfWineGlassesForEquivalentAlcoholAmount = ouncesOfAlcoholTotal / ouncesOfAlcoholPerWineGlass;
-    
-   
-    NSString *beerText;
-    
-    if (numberOfBeers == 1) {
         beerText = NSLocalizedString(@"beer", @"singular beer");
     } else {
         beerText = NSLocalizedString(@"beers", @"plural of beer");
     }
-    
-    NSString *wineText;
-    
+   
     if (numberOfWineGlassesForEquivalentAlcoholAmount == 1) {
         wineText = NSLocalizedString(@"glass", @"singular glass");
     } else {
         wineText = NSLocalizedString(@"glasses", @"plural of glass");
     }
     
+    NSString *beerCountText = [NSString stringWithFormat:NSLocalizedString(@"%d %@", nil), beerCounter, beerText];
+    self.sliderCountLabel.text = beerCountText;
     
-    NSString *resultText = [NSString stringWithFormat:NSLocalizedString(@"%d %@ contains as much alcohol as %.1f %@ of wine.", nil), numberOfBeers, beerText, numberOfWineGlassesForEquivalentAlcoholAmount, wineText];
+    NSString *newTitle = [NSString stringWithFormat:NSLocalizedString(@"Wine (%.1f %@)", nil),numberOfWineGlassesForEquivalentAlcoholAmount, wineText];
+    self.title = newTitle;
+    
+}
+
+
+- (void)buttonPressed:(UIButton *)sender {
+    
+    NSString *resultText = [NSString stringWithFormat:NSLocalizedString(@"%d %@ contains as much alcohol as %.1f %@ of wine.", nil), beerCounter, beerText, numberOfWineGlassesForEquivalentAlcoholAmount, wineText];
     self.resultLabel.text = resultText;
     
 }
+
 
 - (void)tapGestureDidFire:(UITapGestureRecognizer *)sender {
     
