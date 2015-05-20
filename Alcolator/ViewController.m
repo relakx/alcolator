@@ -30,6 +30,16 @@ float numberOfWineGlassesForEquivalentAlcoholAmount;
 NSString *beerText;
 NSString *wineText;
 
+- (instancetype) init {
+    self = [super init];
+    
+    if (self) {
+        self.title = NSLocalizedString(@"Wine", @"wine");
+        [self.tabBarItem setTitlePositionAdjustment:UIOffsetMake(0, -18)];
+    }
+    
+    return self;
+}
 
 - (void)loadView {
     self.view = [[UIView alloc] init];
@@ -57,12 +67,12 @@ NSString *wineText;
     
 }
 
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = [UIColor lightGrayColor];
+    self.view.backgroundColor = [UIColor colorWithRed:0.741 green:0.925 blue:0.714 alpha:1]; /*#bdecb6*/
     [[UILabel appearance] setFont:[UIFont fontWithName:@"TrebuchetMS" size:14]];
     [[UITextField appearance] setFont:[UIFont fontWithName:@"TrebuchetMS" size:14]];
-    self.title = NSLocalizedString(@"Wine", @"wine");
     // colors go here
     self.beerPercentTextField.delegate = self;
     self.beerPercentTextField.placeholder = NSLocalizedString(@"% Alcohol Content Per Beer", @"Beer percent placeholder text");
@@ -133,6 +143,7 @@ NSString *wineText;
 - (void)sliderValueDidChange:(UISlider *)sender {
     NSLog(@"Slider value changed to %f", sender.value);
     [self.beerPercentTextField resignFirstResponder];
+    [self.tabBarItem setBadgeValue:[NSString stringWithFormat:@"%d", (int) sender.value]];
     beerCounter = self.beerCountSlider.value;
     alcoholPercentageOfBeer = [self.beerPercentTextField.text floatValue] / 100;
     ouncesOfAlcoholPerBeer = ouncesInOneBeerGlass * alcoholPercentageOfBeer;
